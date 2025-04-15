@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const modelManager = require('../utils/model-manager');
+const moneyManager = require('../utils/moneyManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -111,7 +112,7 @@ module.exports = {
                         
                         embed.addFields({
                             name: `${model.name} ${modelStatus}`,
-                            value: `**描述:** ${model.description}\n**输入价格:** ${model.inputPrice}\n**输出价格:** ${model.outputPrice}`,
+                            value: `**描述:** ${model.description}\n**输入价格:** ¥${model.inputPrice}/M tokens\n**输出价格:** ¥${model.outputPrice}/M tokens`,
                             inline: false
                         });
                     });
@@ -209,6 +210,17 @@ module.exports = {
                 // 发送请求并获取结果（包含回复内容和费用信息）
                 const result = await modelManager.chat(prompt, { max_tokens: 1500 });
                 const { response, costInfo } = result;
+                
+                // 记录用户消费
+                const userId = interaction.user.id;
+                const username = interaction.user.tag;
+                const cost = costInfo.totalCost; // 这是实际消费金额
+                await moneyManager.recordCost(userId, username, cost, model, {
+                    provider: provider,
+                    inputTokens: costInfo.inputTokens,
+                    outputTokens: costInfo.outputTokens,
+                    prompt: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : '') // 记录问题的前100个字符
+                });
                 
                 // 为了避免Discord消息长度限制，可能需要分割长回复
                 let responseFragments = [];

@@ -14,6 +14,7 @@ class SiliconFlowModel extends BaseModel {
         'Qwen2.5-Coder-7B': 'Qwen/Qwen2.5-Coder-7B-Instruct',
         'GLM-Z1-9B': 'THUDM/GLM-Z1-9B-0414',
         'DeepSeek-R1-7B': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
+        'DeepSeek-V3': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
     };
 
     /**
@@ -36,6 +37,11 @@ class SiliconFlowModel extends BaseModel {
             description: 'DeepSeek-R1-Distill-Qwen-7B 是基于 Qwen2.5-Math-7B 通过知识蒸馏得到的模型。该模型使用 DeepSeek-R1 生成的 80 万个精选样本进行微调，展现出优秀的推理能力。在多个基准测试中表现出色，其中在 MATH-500 上达到了 92.8% 的准确率，在 AIME 2024 上达到了 55.5% 的通过率，在 CodeForces 上获得了 1189 的评分，作为 7B 规模的模型展示了较强的数学和编程能力。',
             inputPrice: '0.0',
             outputPrice: '0.0'
+        },
+        'DeepSeek-V3': {
+            description: '新版 DeepSeek-V3 （DeepSeek-V3-0324）与之前的 DeepSeek-V3-1226 使用同样的 base 模型，仅改进了后训练方法。新版 V3 模型借鉴 DeepSeek-R1 模型训练过程中所使用的强化学习技术，大幅提高了在推理类任务上的表现水平，在数学、代码类相关评测集上取得了超过 GPT-4.5 的得分成绩。此外该模型在工具调用、角色扮演、问答闲聊等方面也得到了一定幅度的能力提升。',
+            inputPrice: '2.0',
+            outputPrice: '8.0'
         }
     };
 
