@@ -20,6 +20,23 @@ module.exports = {
             });
             }
             
+            // 获取当前频道的贡献者列表
+            const contributors = await contributorManager.getChannelContributors(channelId);
+            let contributorMessage = '';
+            
+            if (contributors.length > 0) {
+                // 提取贡献者用户名并格式化为列表
+                const contributorNames = contributors.map(c => c.username.split('#')[0]).join('、');
+                contributorMessage = `当前已有的贡献者：${contributorNames}\n\n`;
+            }
+            
+            // 获取频道信息
+            const channel = await client.channels.fetch(channelId).catch(() => null);
+            const channelName = channel ? channel.name : '此频道';
+            
+            // 无论用户后续是否做出选择，立即标记用户为已询问状态
+            await contributorManager.markAsAsked(channelId, userId);
+            
             // 创建回应按钮
             const row = new ActionRowBuilder()
             .addComponents(
@@ -35,7 +52,7 @@ module.exports = {
             
             // 发送只有触发用户可见的消息（ephemeral: true）
             await interaction.reply({
-                content: `您是第一次在此频道发言，是否将自己添加至贡献列表？`,
+                content: `${contributorMessage}您是第一次在${channelName}发言，是否将自己添加至贡献列表？`,
                 components: [row],
                 ephemeral: true
             });
@@ -92,9 +109,6 @@ module.exports = {
                 }).catch(err => {
                     console.error('无法更新消息:', err);
                 });
-                
-                // 设置用户已被询问，避免再次询问
-                await contributorManager.markAsAsked(channelId, userId);
             }
             
             return;

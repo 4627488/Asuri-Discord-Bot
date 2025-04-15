@@ -32,14 +32,21 @@ module.exports = {
                         .setStyle(ButtonStyle.Primary)
                     );
                 
-                // 发送一条短期消息，引导用户点击按钮
+                // 发送一条消息，引导用户点击按钮
                 const sentMessage = await message.reply({
                     content: `${message.author}，这是您首次在此频道发言，点击下方按钮查看相关信息。`,
                     ephemeral: true,
                     components: [row]
                 }).catch(error => {
                     console.error(`无法在频道回复用户 ${message.author.tag}:`, error);
+                    return null;
                 });
+                
+                // 如果消息发送成功，立即将用户标记为已询问过，无论用户是否点击按钮
+                if (sentMessage) {
+                    await contributorManager.markAsAsked(channelId, userId);
+                    console.log(`用户 ${message.author.tag} 在频道 ${channelId} 已被标记为询问过`);
+                }
             }
         } catch (error) {
             console.error('处理消息事件时出错:', error);
