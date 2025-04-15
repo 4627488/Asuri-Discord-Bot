@@ -17,7 +17,7 @@ class ModelManager {
         this.loadProviders(providersFromEnv);
 
         // 从环境变量加载默认供应商和模型
-        this.currentProvider = process.env.DEFAULT_LLM_PROVIDER || Object.keys(this.providers)[0] || 'deepseek';
+        this.currentProvider = process.env.DEFAULT_LLM_PROVIDER || Object.keys(this.providers)[0];
         this.currentModel = process.env.DEFAULT_MODEL;
 
         // 验证配置是否有效
