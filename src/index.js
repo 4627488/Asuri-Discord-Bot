@@ -3,7 +3,8 @@ const { Client, GatewayIntentBits, Collection, REST, Routes } = require('discord
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-const contributorManager = require('./utils/contributorManager');
+// 注意：先不要导入contributorManager，避免循环引用
+// const contributorManager = require('./utils/contributorManager');
 
 // 创建Discord客户端实例
 const client = new Client({
@@ -133,6 +134,9 @@ const loadEvents = () => {
     }
 };
 
+// 导出client对象，让其他模块可以使用
+module.exports = { client };
+
 // 主函数
 async function main() {
     try {
@@ -144,6 +148,9 @@ async function main() {
         
         // 加载事件处理器
         loadEvents();
+        
+        // 导入contributorManager（在client创建后才导入，避免循环引用）
+        const contributorManager = require('./utils/contributorManager');
         
         // 设置定时清理任务 - 每天检查一次不活跃的频道
         setInterval(async () => {

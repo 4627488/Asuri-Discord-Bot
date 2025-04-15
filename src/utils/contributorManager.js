@@ -1,5 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
+// 移除直接导入，避免循环引用问题
+// const { client } = require('../index');
 
 // 贡献者数据存储路径
 const DATA_DIR = path.join(__dirname, '../../data');
@@ -49,8 +51,46 @@ async function saveContributors(data) {
     }
 }
 
+/**
+ * 检查频道是否为挑战频道（通过/newchallenge创建的）
+ * @param {Channel|string} channel - Discord频道对象或频道ID
+ * @returns {Promise<boolean>} 是否为挑战频道
+ */
+async function isChallengeChannel(channel) {
+    try {
+        // 如果传入的是ID，尝试获取频道对象
+        if (typeof channel === 'string') {
+            // 延迟获取client对象，避免循环引用
+            const { client } = require('../index');
+            
+            // 确保client已经初始化
+            if (!client || !client.channels) {
+                console.log('客户端未初始化，无法检查频道类型');
+                return false;
+            }
+            
+            channel = await client.channels.fetch(channel).catch(() => null);
+            if (!channel) return false;
+        }
+        
+        // 检查频道主题是否以[CHALLENGE]开头
+        const topic = channel.topic || '';
+        return topic.startsWith('[CHALLENGE]');
+    } catch (error) {
+        console.error('检查频道类型时出错:', error);
+        return false;
+    }
+}
+
 // 添加贡献者到频道
 async function addContributor(channelId, userId, username) {
+    // 检查是否为挑战频道，如果不是则不添加贡献者
+    const isChallenge = await isChallengeChannel(channelId);
+    if (!isChallenge) {
+        console.log(`频道 ${channelId} 不是挑战频道，跳过添加贡献者操作`);
+        return false;
+    }
+    
     const contributors = await getContributors();
     
     if (!contributors[channelId]) {
@@ -80,6 +120,12 @@ async function getChannelContributors(channelId) {
 
 // 检查用户是否已经询问过是否添加到贡献列表
 async function hasBeenAsked(channelId, userId) {
+    // 检查是否为挑战频道，如果不是则直接返回已询问(不再询问)
+    const isChallenge = await isChallengeChannel(channelId);
+    if (!isChallenge) {
+        return true; // 非挑战频道视为已询问，不再提示
+    }
+    
     const contributors = await getContributors();
     
     // 创建或获取已询问用户的记录
@@ -189,5 +235,6 @@ module.exports = {
     hasBeenAsked,
     markAsAsked,
     updateChannelActivity,
-    cleanupInactiveChannels
+    cleanupInactiveChannels,
+    isChallengeChannel
 };

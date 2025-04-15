@@ -72,16 +72,16 @@ module.exports = {
             const channel = await client.channels.fetch(channelId).catch(() => null);
             const channelName = channel ? channel.name : '未知频道';
             
-            // 更新原始消息，移除按钮
-            if (interaction.message) {
-            try {
-                await interaction.message.edit({
-                    components: []
-                });
-            } catch (err) {
-                console.error('无法更新消息移除按钮:', err);
-            }
-            }
+            // // 更新原始消息，移除按钮
+            // if (interaction.message) {
+            //     try {
+            //         await interaction.message.edit({
+            //             components: []
+            //         });
+            //     } catch (err) {
+            //         console.error('无法更新消息移除按钮:', err);
+            //     }
+            // }
             
             if (choice === 'yes') {
                 // 用户选择添加到贡献列表

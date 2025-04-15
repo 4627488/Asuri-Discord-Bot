@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const modelManager = require('../utils/model-manager');
+const modelManager = require('../utils/modelManager');
 const moneyManager = require('../utils/moneyManager');
 
 module.exports = {
